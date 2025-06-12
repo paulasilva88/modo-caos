@@ -1,44 +1,65 @@
-window.addEventListener('DOMContentLoaded', () => {
-  const noBtn = document.getElementById('noBtn');
-  const body = document.body;
+document.getElementById("noBtn").addEventListener("click", function() {
+  const button = this;
+  
+  // Posição inicial do botão
+  const initialPosition = {
+    top: button.offsetTop,
+    left: button.offsetLeft
+  };
+  
+  // Função para mover o botão aleatoriamente
+  function moveButton() {
+    // Obtém a largura e altura da janela
+    const width = window.innerWidth;
+    const height = window.innerHeight;
 
-  function getRandomPosition() {
-    const maxX = window.innerWidth - noBtn.offsetWidth;  // Largura total da janela
-    const maxY = window.innerHeight - noBtn.offsetHeight; // Altura total da janela
-    const x = Math.floor(Math.random() * maxX);
-    const y = Math.floor(Math.random() * maxY);
-    return { x, y };
+    // Gera posições aleatórias dentro da janela
+    const randomX = Math.floor(Math.random() * (width - 100)); // Subtrai 100 para garantir que o botão não saia da tela
+    const randomY = Math.floor(Math.random() * (height - 50)); // Subtrai 50 para garantir que o botão não saia da tela
+
+    // Muda a posição do botão
+    button.style.position = 'absolute'; // Garantir que o botão é posicionado de forma absoluta
+    button.style.left = randomX + 'px';
+    button.style.top = randomY + 'px';
   }
+  
+  // Inicia a movimentação do botão a cada 100ms
+  const danceInterval = setInterval(moveButton, 100);
 
-  function getRandomTransform() {
-    const rotate = Math.floor(Math.random() * 60) - 30; // -30 a 30 graus
-    const scale = 0.8 + Math.random() * 0.5; // De 0.8 a 1.3
-    return `rotate(${rotate}deg) scale(${scale})`;
+  // Após 5 segundos, o botão começa a desaparecer
+  setTimeout(function() {
+    // Para a movimentação
+    clearInterval(danceInterval); 
+    
+    // Inicia o desaparecimento
+    let opacity = 1; // Começa com a opacidade 1 (visível)
+    const fadeOutInterval = setInterval(function() {
+      if (opacity <= 0) {
+        clearInterval(fadeOutInterval); // Para o fade-out quando a opacidade chegar a 0
+        button.style.display = 'none'; // Esconde o botão
+        showNewButton(); // Exibe o novo botão
+      } else {
+        opacity -= 0.05; // Diminui a opacidade aos poucos
+        button.style.opacity = opacity;
+      }
+    }, 50); // Controla a velocidade do fade-out (50ms por mudança)
+  }, 5000); // 5 segundos de dança
+  
+  // Função para exibir o novo botão "Não"
+  function showNewButton() {
+    const newButton = document.createElement("button");
+    newButton.classList.add("btn", "no");
+    newButton.textContent = "Não"; // Novo texto no botão
+    newButton.onclick = function() {
+      window.location.href = "nao.html"; // Redireciona para "nao.html"
+    };
+
+    // Adiciona o novo botão ao corpo da página
+    document.body.appendChild(newButton);
+
+    // Coloca o novo botão no mesmo lugar que o antigo
+    newButton.style.position = 'absolute';
+    newButton.style.left = initialPosition.left + 'px';
+    newButton.style.top = initialPosition.top + 'px';
   }
-
-  function getRandomColor() {
-    const colors = ['#ff79c6', '#bd93f9', '#8be9fd', '#f1fa8c', '#ffb86c'];
-    return colors[Math.floor(Math.random() * colors.length)];
-  }
-
-  noBtn.addEventListener('click', () => {
-    // Atualiza a posição do botão
-    const { x, y } = getRandomPosition();
-    noBtn.style.left = `${x}px`;
-    noBtn.style.top = `${y}px`;
-
-    // Aplica rotação e escala
-    const transform = getRandomTransform();
-    noBtn.style.transform = transform;
-
-    // Aplica cor aleatória por 0.5s
-    const color = getRandomColor();
-    noBtn.style.backgroundColor = color;
-
-    // Volta à cor e forma originais após 0.5s
-    setTimeout(() => {
-      noBtn.style.backgroundColor = '#ff5555';
-      noBtn.style.transform = 'none';
-    }, 500);
-  });
 });
